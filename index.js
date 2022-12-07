@@ -1,8 +1,17 @@
-const totalPackingSpace = 120;
-const packingSlots = [];
+// Generate empty packing slots. null means there is no car in the packing slot
+const packingSlots = new Array(5).fill(null);
+const totalPackingSpace = packingSlots.length;
 const chargesPerHour = 50;
 
-let availableSpace = Math.abs(packingSlots.length - totalPackingSpace)
+// get all available space
+let availableSpace = function(){
+    return packingSlots.reduce((totalAvailableSpace, space)=>{
+        if(space == null){
+            totalAvailableSpace += 1;
+        }
+        return totalAvailableSpace;
+    }, 0)
+};
 
 /**
  * Car registration
@@ -12,7 +21,7 @@ let availableSpace = Math.abs(packingSlots.length - totalPackingSpace)
 function generatePackingTicket( carRegistration, timeIn ){
 
     // Do not allow packing if there is no available slots
-    if(availableSpace == 0){
+    if(availableSpace() == 0){
         console.log("There is no packing space available");
         return;
     }
@@ -23,11 +32,12 @@ function generatePackingTicket( carRegistration, timeIn ){
         timeIn: timeIn
     }
 
-    //Pack the car
-    packingSlots.push(car);
-    console.log(`Your ticket number is ${packingSlots.length - 1}`)
-    // calculate available slots
-    availableSpace = Math.abs(packingSlots.length - totalPackingSpace)
+    // get one available packing slot
+    const slot = packingSlots.findIndex( (space) => space == null );
+    // pack the car in that empty space
+    packingSlots[ slot ] = car;
+
+    console.log(`Your ticket number is ${slot}`);
 }
 
 /**
@@ -48,8 +58,9 @@ function calculateCost(slot, timeOut){
 }
 
 function existPackingSlot(slot){
-    packingSlots.splice(slot, 1);
-    console.table(packingSlots);
+    /* packingSlots.splice(slot, 1);
+    console.table(packingSlots); */
+    packingSlots[slot] = null;
 }
 
 
@@ -64,4 +75,5 @@ console.log("Payment Ksh", calculateCost(1, new Date()));
 console.log("Payment Ksh", calculateCost(2, new Date()));
 
 existPackingSlot(1);
+console.table(packingSlots);
 
